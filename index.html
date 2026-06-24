@@ -108,6 +108,14 @@
     vertical-align: middle;
   }
 
+  .package-discount {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0F6E3F;
+    margin-top: 2px;
+  }
+
   .base-group {
     display: flex;
     flex-direction: column;
@@ -265,36 +273,39 @@
 <body>
 
   <h1>Скільки коштує ваше відео</h1>
-  <p class="subtitle">Оберіть пакет — чим більший обʼєм, тим більше факторів складності входять безкоштовно.</p>
+  <p class="subtitle">Оберіть пакет — чим більший обʼєм, тим дешевші фактори складності за одне відео.</p>
 
   <p class="section-label">Пакет</p>
   <div class="package-group" id="package-group">
-    <div class="package-btn active" data-key="test" data-price="49" data-label="TEST">
+    <div class="package-btn active" data-key="test" data-price="49" data-qty="3" data-label="TEST">
       <span>
         <span class="package-name">TEST</span>
         <span class="package-qty"> · 2–3 відео</span>
       </span>
       <span class="package-price">від $49</span>
     </div>
-    <div class="package-btn" data-key="start" data-price="299" data-label="START">
+    <div class="package-btn" data-key="start" data-price="299" data-qty="10" data-label="START">
       <span>
         <span class="package-name">START</span>
         <span class="package-qty"> · 10 відео</span>
+        <span class="package-discount">−20% на факторах</span>
       </span>
       <span class="package-price">$299</span>
     </div>
-    <div class="package-btn" data-key="growth" data-price="499" data-label="GROWTH">
+    <div class="package-btn" data-key="growth" data-price="499" data-qty="20" data-label="GROWTH">
       <span>
         <span class="package-name">GROWTH</span>
         <span class="package-qty"> · 20 відео</span>
         <span class="package-popular">★ Популярний</span>
+        <span class="package-discount">−40% на факторах</span>
       </span>
       <span class="package-price">від $499</span>
     </div>
-    <div class="package-btn" data-key="pro" data-price="799" data-label="PRO">
+    <div class="package-btn" data-key="pro" data-price="799" data-qty="30" data-label="PRO">
       <span>
         <span class="package-name">PRO</span>
         <span class="package-qty"> · 30 відео</span>
+        <span class="package-discount">−50% на факторах</span>
       </span>
       <span class="package-price">від $799</span>
     </div>
@@ -357,23 +368,20 @@
   }
 
   // Ordered cheapest → most expensive.
-  // includeFrom marks the package key at which the factor becomes free.
+  // pricePerVideo: cost per video for each package — moderate volume discount,
+  // no factor ever reaches $0 (your real AI cost per video scales with complexity
+  // regardless of package size).
   const FACTORS = [
-    { id: 'camera',  name: 'Рух камери (не статика)',   price: 10, includeFrom: 'start'  },
-    { id: 'dub',     name: 'Дубляж на 1 мову',           price: 10, includeFrom: 'growth' },
-    { id: 'brand',   name: 'Брендовані елементи / лого', price: 12, includeFrom: 'pro'    },
-    { id: 'avatar2', name: 'Другий аватар у кадрі',      price: 15, includeFrom: 'pro'    },
-    { id: 'product', name: 'Взаємодія з продуктом',      price: 20, includeFrom: 'growth' },
+    { id: 'camera',  name: 'Рух камери (не статика)',   pricePerVideo: { test: 10, start: 8,  growth: 6,  pro: 5  } },
+    { id: 'dub',     name: 'Дубляж на 1 мову',           pricePerVideo: { test: 10, start: 8,  growth: 6,  pro: 5  } },
+    { id: 'brand',   name: 'Брендовані елементи / лого', pricePerVideo: { test: 12, start: 10, growth: 8,  pro: 6  } },
+    { id: 'avatar2', name: 'Другий аватар у кадрі',      pricePerVideo: { test: 15, start: 12, growth: 10, pro: 8  } },
+    { id: 'product', name: 'Взаємодія з продуктом',      pricePerVideo: { test: 20, start: 16, growth: 13, pro: 10 } },
   ];
-
-  const PACKAGE_ORDER = ['test', 'start', 'growth', 'pro'];
-
-  function packageAtOrAbove(pkgKey, threshold) {
-    return PACKAGE_ORDER.indexOf(pkgKey) >= PACKAGE_ORDER.indexOf(threshold);
-  }
 
   let currentPackage = 'test';
   let packageBasePrice = 49;
+  let packageQty = 3;
   let packageLabel = 'TEST';
 
   let basePrice = 0;
@@ -386,6 +394,7 @@
       btn.classList.add('active');
       currentPackage = btn.dataset.key;
       packageBasePrice = parseFloat(btn.dataset.price);
+      packageQty = parseFloat(btn.dataset.qty);
       packageLabel = btn.dataset.label;
       renderFactors();
       recalc();
@@ -408,34 +417,28 @@
     grid.innerHTML = '';
 
     FACTORS.forEach(factor => {
-      const isIncluded = packageAtOrAbove(currentPackage, factor.includeFrom);
+      const perVideo = factor.pricePerVideo[currentPackage];
+      const totalForPackage = perVideo * packageQty;
 
       const row = document.createElement('label');
-      row.className = 'opt-row' + (isIncluded ? ' included' : '');
+      row.className = 'opt-row';
 
-      if (isIncluded) {
-        row.innerHTML =
-          '<span class="included-badge">✓</span>' +
-          '<span class="opt-text">' +
-            '<span class="opt-title">' + factor.name + '</span>' +
-            '<span class="opt-sub">Включено в пакет</span>' +
-          '</span>';
-      } else {
-        row.innerHTML =
-          '<input type="checkbox" data-add="' + factor.price + '" data-name="' + factor.name + '">' +
-          '<span class="opt-text">' +
-            '<span class="opt-title">' + factor.name + '</span>' +
-            '<span class="opt-sub">+$' + factor.price + '</span>' +
-          '</span>';
-        const cb = row.querySelector('input[type="checkbox"]');
-        row.addEventListener('click', (e) => {
-          if (e.target.tagName !== 'INPUT') {
-            cb.checked = !cb.checked;
-          }
-          row.classList.toggle('checked', cb.checked);
-          recalc();
-        });
-      }
+      let priceHint = '$' + perVideo + ' / відео · +$' + totalForPackage + ' за пакет';
+
+      row.innerHTML =
+        '<input type="checkbox" data-per-video="' + perVideo + '" data-name="' + factor.name + '">' +
+        '<span class="opt-text">' +
+          '<span class="opt-title">' + factor.name + '</span>' +
+          '<span class="opt-sub">' + priceHint + '</span>' +
+        '</span>';
+      const cb = row.querySelector('input[type="checkbox"]');
+      row.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'INPUT') {
+          cb.checked = !cb.checked;
+        }
+        row.classList.toggle('checked', cb.checked);
+        recalc();
+      });
 
       grid.appendChild(row);
     });
@@ -444,17 +447,12 @@
   function recalc() {
     let total = packageBasePrice + basePrice;
     let extras = [];
-    let includedExtras = [];
 
     document.querySelectorAll('#opt-grid input[type="checkbox"]:checked').forEach(cb => {
-      total += parseFloat(cb.dataset.add);
-      extras.push(cb.dataset.name);
-    });
-
-    FACTORS.forEach(factor => {
-      if (packageAtOrAbove(currentPackage, factor.includeFrom)) {
-        includedExtras.push(factor.name);
-      }
+      const perVideo = parseFloat(cb.dataset.perVideo);
+      const lineTotal = perVideo * packageQty;
+      total += lineTotal;
+      extras.push(cb.dataset.name + ' (+$' + lineTotal + ')');
     });
 
     document.getElementById('total').textContent = '$' + Math.round(total);
@@ -469,7 +467,6 @@
       packageLabel,
       baseLabel,
       extras,
-      includedExtras,
     };
   }
 
@@ -484,7 +481,6 @@
     const payload = {
       base: result.packageLabel + (result.baseLabel !== 'Talking head' ? ' · ' + result.baseLabel : ''),
       extras: result.extras,
-      includedExtras: result.includedExtras,
       total: result.total,
       clientName: clientName || null,
     };
