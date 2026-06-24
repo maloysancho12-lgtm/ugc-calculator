@@ -15,6 +15,8 @@
     --accent: #5B4FE9;
     --accent-bg: #EEEDFE;
     --accent-text: #26215C;
+    --included-bg: #E7F8EE;
+    --included-text: #0F6E3F;
   }
 
   * { box-sizing: border-box; }
@@ -44,6 +46,66 @@
     color: var(--text-secondary);
     margin: 0 0 8px;
     font-weight: 500;
+  }
+
+  .package-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .package-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .package-btn.active {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+
+  .package-name {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .package-btn.active .package-name {
+    color: var(--accent-text);
+  }
+
+  .package-qty {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .package-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .package-btn.active .package-price {
+    color: var(--accent-text);
+  }
+
+  .package-popular {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    background: var(--accent);
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
   }
 
   .base-group {
@@ -106,6 +168,12 @@
     background: var(--accent-bg);
   }
 
+  .opt-row.included {
+    border-color: var(--included-text);
+    background: var(--included-bg);
+    cursor: default;
+  }
+
   .opt-row input[type="checkbox"] {
     width: 20px;
     height: 20px;
@@ -128,6 +196,16 @@
   .opt-sub {
     font-size: 12px;
     color: var(--text-secondary);
+  }
+
+  .opt-row.included .opt-sub {
+    color: var(--included-text);
+    font-weight: 600;
+  }
+
+  .included-badge {
+    font-size: 16px;
+    color: var(--included-text);
   }
 
   .result-box {
@@ -178,74 +256,68 @@
   .send-btn:active {
     opacity: 0.85;
   }
+
+  .send-btn:disabled {
+    opacity: 0.6;
+  }
 </style>
 </head>
 <body>
 
   <h1>Скільки коштує ваше відео</h1>
-  <p class="subtitle">Оберіть тип відео і додайте фактори складності — отримаєте орієнтовну ціну.</p>
+  <p class="subtitle">Оберіть пакет — чим більший обʼєм, тим більше факторів складності входять безкоштовно.</p>
 
-  <p class="section-label">Тип відео</p>
+  <p class="section-label">Пакет</p>
+  <div class="package-group" id="package-group">
+    <div class="package-btn active" data-key="test" data-price="49" data-label="TEST">
+      <span>
+        <span class="package-name">TEST</span>
+        <span class="package-qty"> · 2–3 відео</span>
+      </span>
+      <span class="package-price">від $49</span>
+    </div>
+    <div class="package-btn" data-key="start" data-price="299" data-label="START">
+      <span>
+        <span class="package-name">START</span>
+        <span class="package-qty"> · 10 відео</span>
+      </span>
+      <span class="package-price">$299</span>
+    </div>
+    <div class="package-btn" data-key="growth" data-price="499" data-label="GROWTH">
+      <span>
+        <span class="package-name">GROWTH</span>
+        <span class="package-qty"> · 20 відео</span>
+        <span class="package-popular">★ Популярний</span>
+      </span>
+      <span class="package-price">від $499</span>
+    </div>
+    <div class="package-btn" data-key="pro" data-price="799" data-label="PRO">
+      <span>
+        <span class="package-name">PRO</span>
+        <span class="package-qty"> · 30 відео</span>
+      </span>
+      <span class="package-price">від $799</span>
+    </div>
+  </div>
+
+  <p class="section-label">Тип відео (для прикладу / тестового ролика)</p>
   <div class="base-group" id="base-group">
-    <div class="base-btn active" data-price="30" data-label="Talking head">
+    <div class="base-btn active" data-price="0" data-label="Talking head">
       <span>Talking head</span>
-      <span class="price-tag">від $30</span>
+      <span class="price-tag">базовий</span>
     </div>
-    <div class="base-btn" data-price="45" data-label="Демонстрація продукту">
+    <div class="base-btn" data-price="15" data-label="Демонстрація продукту">
       <span>Демонстрація продукту</span>
-      <span class="price-tag">від $45</span>
+      <span class="price-tag">+$15</span>
     </div>
-    <div class="base-btn" data-price="60" data-label="Сторітелінг / кілька сцен">
+    <div class="base-btn" data-price="30" data-label="Сторітелінг / кілька сцен">
       <span>Сторітелінг / кілька сцен</span>
-      <span class="price-tag">від $60</span>
+      <span class="price-tag">+$30</span>
     </div>
   </div>
 
   <p class="section-label">Додаткові фактори</p>
-  <div class="opt-grid" id="opt-grid">
-    <label class="opt-row">
-      <input type="checkbox" data-add="15" data-name="Додаткова сцена / локація">
-      <span class="opt-text">
-        <span class="opt-title">Додаткова сцена / локація</span>
-        <span class="opt-sub">+$15</span>
-      </span>
-    </label>
-    <label class="opt-row">
-      <input type="checkbox" data-add="10" data-name="Рух камери (не статика)">
-      <span class="opt-text">
-        <span class="opt-title">Рух камери (не статика)</span>
-        <span class="opt-sub">+$10</span>
-      </span>
-    </label>
-    <label class="opt-row">
-      <input type="checkbox" data-add="20" data-name="Взаємодія з продуктом">
-      <span class="opt-text">
-        <span class="opt-title">Взаємодія з продуктом</span>
-        <span class="opt-sub">+$20</span>
-      </span>
-    </label>
-    <label class="opt-row">
-      <input type="checkbox" data-add="15" data-name="Другий аватар у кадрі">
-      <span class="opt-text">
-        <span class="opt-title">Другий аватар у кадрі</span>
-        <span class="opt-sub">+$15</span>
-      </span>
-    </label>
-    <label class="opt-row">
-      <input type="checkbox" data-add="10" data-name="Дубляж на 1 мову">
-      <span class="opt-text">
-        <span class="opt-title">Дубляж на 1 мову</span>
-        <span class="opt-sub">+$10</span>
-      </span>
-    </label>
-    <label class="opt-row">
-      <input type="checkbox" data-add="12" data-name="Брендовані елементи / лого">
-      <span class="opt-text">
-        <span class="opt-title">Брендовані елементи / лого</span>
-        <span class="opt-sub">+$12</span>
-      </span>
-    </label>
-  </div>
+  <div class="opt-grid" id="opt-grid"></div>
 
   <div style="margin-bottom: 16px;">
     <label style="font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Ваше імʼя (щоб ми знали від кого розрахунок)</label>
@@ -255,10 +327,10 @@
 
   <div class="result-box">
     <div class="result-row">
-      <span class="result-label" id="breakdown">Talking head</span>
+      <span class="result-label" id="breakdown">TEST</span>
       <span>
-        <span class="result-price" id="total">$30</span>
-        <span class="result-unit">/ відео</span>
+        <span class="result-price" id="total">$49</span>
+        <span class="result-unit">/ пакет</span>
       </span>
     </div>
     <button class="send-btn" id="send-btn">Надіслати розрахунок</button>
@@ -271,7 +343,6 @@
     tg.ready();
     tg.expand();
 
-    // Sync with Telegram theme colors if available
     const root = document.documentElement;
     if (tg.themeParams) {
       const tp = tg.themeParams;
@@ -285,8 +356,41 @@
     }
   }
 
-  let basePrice = 30;
-  let baseLabel = "Talking head";
+  // Ordered cheapest → most expensive.
+  // includeFrom marks the package key at which the factor becomes free.
+  const FACTORS = [
+    { id: 'camera',  name: 'Рух камери (не статика)',   price: 10, includeFrom: 'start'  },
+    { id: 'dub',     name: 'Дубляж на 1 мову',           price: 10, includeFrom: 'growth' },
+    { id: 'brand',   name: 'Брендовані елементи / лого', price: 12, includeFrom: 'pro'    },
+    { id: 'avatar2', name: 'Другий аватар у кадрі',      price: 15, includeFrom: 'pro'    },
+    { id: 'product', name: 'Взаємодія з продуктом',      price: 20, includeFrom: 'growth' },
+  ];
+
+  const PACKAGE_ORDER = ['test', 'start', 'growth', 'pro'];
+
+  function packageAtOrAbove(pkgKey, threshold) {
+    return PACKAGE_ORDER.indexOf(pkgKey) >= PACKAGE_ORDER.indexOf(threshold);
+  }
+
+  let currentPackage = 'test';
+  let packageBasePrice = 49;
+  let packageLabel = 'TEST';
+
+  let basePrice = 0;
+  let baseLabel = 'Talking head';
+
+  const packageButtons = document.querySelectorAll('.package-btn');
+  packageButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      packageButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPackage = btn.dataset.key;
+      packageBasePrice = parseFloat(btn.dataset.price);
+      packageLabel = btn.dataset.label;
+      renderFactors();
+      recalc();
+    });
+  });
 
   const baseButtons = document.querySelectorAll('.base-btn');
   baseButtons.forEach(btn => {
@@ -299,34 +403,76 @@
     });
   });
 
-  document.querySelectorAll('.opt-row').forEach(row => {
-    const cb = row.querySelector('input[type="checkbox"]');
-    row.addEventListener('click', (e) => {
-      if (e.target.tagName !== 'INPUT') {
-        cb.checked = !cb.checked;
+  function renderFactors() {
+    const grid = document.getElementById('opt-grid');
+    grid.innerHTML = '';
+
+    FACTORS.forEach(factor => {
+      const isIncluded = packageAtOrAbove(currentPackage, factor.includeFrom);
+
+      const row = document.createElement('label');
+      row.className = 'opt-row' + (isIncluded ? ' included' : '');
+
+      if (isIncluded) {
+        row.innerHTML =
+          '<span class="included-badge">✓</span>' +
+          '<span class="opt-text">' +
+            '<span class="opt-title">' + factor.name + '</span>' +
+            '<span class="opt-sub">Включено в пакет</span>' +
+          '</span>';
+      } else {
+        row.innerHTML =
+          '<input type="checkbox" data-add="' + factor.price + '" data-name="' + factor.name + '">' +
+          '<span class="opt-text">' +
+            '<span class="opt-title">' + factor.name + '</span>' +
+            '<span class="opt-sub">+$' + factor.price + '</span>' +
+          '</span>';
+        const cb = row.querySelector('input[type="checkbox"]');
+        row.addEventListener('click', (e) => {
+          if (e.target.tagName !== 'INPUT') {
+            cb.checked = !cb.checked;
+          }
+          row.classList.toggle('checked', cb.checked);
+          recalc();
+        });
       }
-      row.classList.toggle('checked', cb.checked);
-      recalc();
+
+      grid.appendChild(row);
     });
-  });
+  }
 
   function recalc() {
-    let total = basePrice;
+    let total = packageBasePrice + basePrice;
     let extras = [];
-    document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+    let includedExtras = [];
+
+    document.querySelectorAll('#opt-grid input[type="checkbox"]:checked').forEach(cb => {
       total += parseFloat(cb.dataset.add);
       extras.push(cb.dataset.name);
     });
+
+    FACTORS.forEach(factor => {
+      if (packageAtOrAbove(currentPackage, factor.includeFrom)) {
+        includedExtras.push(factor.name);
+      }
+    });
+
     document.getElementById('total').textContent = '$' + Math.round(total);
-    const breakdownText = extras.length > 0
-      ? baseLabel + ' + ' + extras.length + ' ' + (extras.length === 1 ? 'фактор' : 'фактори')
-      : baseLabel;
-    document.getElementById('breakdown').textContent = breakdownText;
-    return { total: Math.round(total), baseLabel, extras };
+
+    let breakdownParts = [packageLabel];
+    if (basePrice > 0) breakdownParts.push(baseLabel);
+    if (extras.length > 0) breakdownParts.push('+' + extras.length + ' ' + (extras.length === 1 ? 'фактор' : 'фактори'));
+    document.getElementById('breakdown').textContent = breakdownParts.join(' · ');
+
+    return {
+      total: Math.round(total),
+      packageLabel,
+      baseLabel,
+      extras,
+      includedExtras,
+    };
   }
 
-  // Backend endpoint that forwards the calculation to your Telegram chat.
-  // Replace this URL with your deployed Vercel function URL.
   const BACKEND_URL = 'https://ugc-calculator-backend.vercel.app/api/calculate';
 
   document.getElementById('send-btn').addEventListener('click', async () => {
@@ -336,8 +482,9 @@
     const btn = document.getElementById('send-btn');
 
     const payload = {
-      base: result.baseLabel,
+      base: result.packageLabel + (result.baseLabel !== 'Talking head' ? ' · ' + result.baseLabel : ''),
       extras: result.extras,
+      includedExtras: result.includedExtras,
       total: result.total,
       clientName: clientName || null,
     };
@@ -366,6 +513,7 @@
     }
   });
 
+  renderFactors();
   recalc();
 </script>
 
