@@ -247,6 +247,12 @@
     </label>
   </div>
 
+  <div style="margin-bottom: 16px;">
+    <label style="font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Ваше імʼя (щоб ми знали від кого розрахунок)</label>
+    <input type="text" id="client-name" placeholder="Напр. Olena, ТОВ Чисто Дім"
+      style="width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--text);">
+  </div>
+
   <div class="result-box">
     <div class="result-row">
       <span class="result-label" id="breakdown">Talking head</span>
@@ -256,6 +262,7 @@
       </span>
     </div>
     <button class="send-btn" id="send-btn">Надіслати розрахунок</button>
+    <p id="send-status" style="font-size: 12px; text-align: center; margin: 10px 0 0; color: var(--text-secondary);"></p>
   </div>
 
 <script>
@@ -318,22 +325,44 @@
     return { total: Math.round(total), baseLabel, extras };
   }
 
-  document.getElementById('send-btn').addEventListener('click', () => {
+  // Backend endpoint that forwards the calculation to your Telegram chat.
+  // Replace this URL with your deployed Vercel function URL.
+  const BACKEND_URL = 'https://ugc-calculator-backend.vercel.app/api/calculate';
+
+  document.getElementById('send-btn').addEventListener('click', async () => {
     const result = recalc();
-    const message = {
-      type: 'price_calculation',
+    const clientName = document.getElementById('client-name').value.trim();
+    const statusEl = document.getElementById('send-status');
+    const btn = document.getElementById('send-btn');
+
+    const payload = {
       base: result.baseLabel,
       extras: result.extras,
-      total: result.total
+      total: result.total,
+      clientName: clientName || null,
     };
 
-    if (tg) {
-      // Sends data back to the bot — bot receives this in web_app_data
-      tg.sendData(JSON.stringify(message));
-    } else {
-      // Fallback for testing outside Telegram
-      alert('Розрахунок: ' + result.baseLabel + ' = $' + result.total +
-            (result.extras.length ? '\n\nДодатково:\n' + result.extras.join('\n') : ''));
+    btn.disabled = true;
+    btn.textContent = 'Надсилаємо…';
+    statusEl.textContent = '';
+
+    try {
+      const response = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error('Request failed');
+
+      btn.textContent = 'Надіслано ✓';
+      statusEl.textContent = 'Дякуємо! Розрахунок надіслано виконавцю.';
+      statusEl.style.color = 'var(--accent)';
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Надіслати розрахунок';
+      statusEl.textContent = 'Не вдалося надіслати. Спробуйте ще раз або напишіть нам прямо в чат.';
+      statusEl.style.color = '#E8453C';
     }
   });
 
