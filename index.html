@@ -288,7 +288,7 @@
       <span>
         <span class="package-name">START</span>
         <span class="package-qty"> · 10 відео</span>
-        <span class="package-discount">−20% на факторах</span>
+        <span class="package-discount">−20%</span>
       </span>
       <span class="package-price">$299</span>
     </div>
@@ -297,7 +297,7 @@
         <span class="package-name">GROWTH</span>
         <span class="package-qty"> · 20 відео</span>
         <span class="package-popular">★ Популярний</span>
-        <span class="package-discount">−40% на факторах</span>
+        <span class="package-discount">−40%</span>
       </span>
       <span class="package-price">від $499</span>
     </div>
@@ -305,7 +305,7 @@
       <span>
         <span class="package-name">PRO</span>
         <span class="package-qty"> · 30 відео</span>
-        <span class="package-discount">−50% на факторах</span>
+        <span class="package-discount">−50%</span>
       </span>
       <span class="package-price">від $799</span>
     </div>
@@ -319,11 +319,11 @@
     </div>
     <div class="base-btn" data-price="15" data-label="Демонстрація продукту">
       <span>Демонстрація продукту</span>
-      <span class="price-tag">+$15</span>
+      <span class="price-tag" id="base-price-product">+$15 / відео</span>
     </div>
     <div class="base-btn" data-price="30" data-label="Сторітелінг / кілька сцен">
       <span>Сторітелінг / кілька сцен</span>
-      <span class="price-tag">+$30</span>
+      <span class="price-tag" id="base-price-story">+$30 / відео</span>
     </div>
   </div>
 
@@ -331,9 +331,10 @@
   <div class="opt-grid" id="opt-grid"></div>
 
   <div style="margin-bottom: 16px;">
-    <label style="font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Ваше імʼя (щоб ми знали від кого розрахунок)</label>
-    <input type="text" id="client-name" placeholder="Напр. Olena, ТОВ Чисто Дім"
+    <label style="font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Ваш нік в Telegram або інший спосіб зв'язку *</label>
+    <input type="text" id="client-name" placeholder="Напр. @ваш_нік або номер телефону"
       style="width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--text);">
+    <p id="contact-error" style="font-size: 12px; color: #E8453C; margin: 6px 0 0; display: none;">Будь ласка, вкажіть нік в Telegram або інший спосіб зв'язку</p>
   </div>
 
   <div class="result-box">
@@ -344,7 +345,7 @@
         <span class="result-unit">/ пакет</span>
       </span>
     </div>
-    <button class="send-btn" id="send-btn">Надіслати розрахунок</button>
+    <button class="send-btn" id="send-btn">Надіслати запит</button>
     <p id="send-status" style="font-size: 12px; text-align: center; margin: 10px 0 0; color: var(--text-secondary);"></p>
   </div>
 
@@ -397,9 +398,17 @@
       packageQty = parseFloat(btn.dataset.qty);
       packageLabel = btn.dataset.label;
       renderFactors();
+      updateBaseTypePriceTags();
       recalc();
     });
   });
+
+  function updateBaseTypePriceTags() {
+    document.getElementById('base-price-product').textContent =
+      '+$' + (15 * packageQty) + ' за пакет';
+    document.getElementById('base-price-story').textContent =
+      '+$' + (30 * packageQty) + ' за пакет';
+  }
 
   const baseButtons = document.querySelectorAll('.base-btn');
   baseButtons.forEach(btn => {
@@ -432,10 +441,7 @@
           '<span class="opt-sub">' + priceHint + '</span>' +
         '</span>';
       const cb = row.querySelector('input[type="checkbox"]');
-      row.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'INPUT') {
-          cb.checked = !cb.checked;
-        }
+      cb.addEventListener('change', () => {
         row.classList.toggle('checked', cb.checked);
         recalc();
       });
@@ -445,7 +451,8 @@
   }
 
   function recalc() {
-    let total = packageBasePrice + basePrice;
+    const baseTotal = basePrice * packageQty;
+    let total = packageBasePrice + baseTotal;
     let extras = [];
 
     document.querySelectorAll('#opt-grid input[type="checkbox"]:checked').forEach(cb => {
@@ -476,13 +483,24 @@
     const result = recalc();
     const clientName = document.getElementById('client-name').value.trim();
     const statusEl = document.getElementById('send-status');
+    const errorEl = document.getElementById('contact-error');
+    const contactInput = document.getElementById('client-name');
     const btn = document.getElementById('send-btn');
+
+    if (!clientName) {
+      errorEl.style.display = 'block';
+      contactInput.style.borderColor = '#E8453C';
+      contactInput.focus();
+      return;
+    }
+    errorEl.style.display = 'none';
+    contactInput.style.borderColor = 'var(--border)';
 
     const payload = {
       base: result.packageLabel + (result.baseLabel !== 'Talking head' ? ' · ' + result.baseLabel : ''),
       extras: result.extras,
       total: result.total,
-      clientName: clientName || null,
+      clientName: clientName,
     };
 
     btn.disabled = true;
@@ -503,13 +521,14 @@
       statusEl.style.color = 'var(--accent)';
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = 'Надіслати розрахунок';
+      btn.textContent = 'Надіслати запит';
       statusEl.textContent = 'Не вдалося надіслати. Спробуйте ще раз або напишіть нам прямо в чат.';
       statusEl.style.color = '#E8453C';
     }
   });
 
   renderFactors();
+  updateBaseTypePriceTags();
   recalc();
 </script>
 
