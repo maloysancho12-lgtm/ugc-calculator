@@ -313,17 +313,17 @@
 
   <p class="section-label">Тип відео (для прикладу / тестового ролика)</p>
   <div class="base-group" id="base-group">
-    <div class="base-btn active" data-price="0" data-label="Talking head">
+    <div class="base-btn active" data-key="talking" data-label="Talking head">
       <span>Talking head</span>
       <span class="price-tag">базовий</span>
     </div>
-    <div class="base-btn" data-price="15" data-label="Демонстрація продукту">
+    <div class="base-btn" data-key="product" data-label="Демонстрація продукту">
       <span>Демонстрація продукту</span>
-      <span class="price-tag" id="base-price-product">+$15 / відео</span>
+      <span class="price-tag" id="base-price-product"></span>
     </div>
-    <div class="base-btn" data-price="30" data-label="Сторітелінг / кілька сцен">
+    <div class="base-btn" data-key="story" data-label="Сторітелінг / кілька сцен">
       <span>Сторітелінг / кілька сцен</span>
-      <span class="price-tag" id="base-price-story">+$30 / відео</span>
+      <span class="price-tag" id="base-price-story"></span>
     </div>
   </div>
 
@@ -380,13 +380,19 @@
     { id: 'product', name: 'Взаємодія з продуктом',      pricePerVideo: { test: 20, start: 16, growth: 13, pro: 10 } },
   ];
 
+  // Video type surcharges also get the volume discount on bigger packages.
+  const BASE_TYPES = {
+    talking: { label: 'Talking head',                pricePerVideo: { test: 0,  start: 0,  growth: 0,  pro: 0  } },
+    product: { label: 'Демонстрація продукту',        pricePerVideo: { test: 15, start: 12, growth: 9,  pro: 8  } },
+    story:   { label: 'Сторітелінг / кілька сцен',    pricePerVideo: { test: 30, start: 24, growth: 18, pro: 15 } },
+  };
+
   let currentPackage = 'test';
   let packageBasePrice = 49;
   let packageQty = 3;
   let packageLabel = 'TEST';
 
-  let basePrice = 0;
-  let baseLabel = 'Talking head';
+  let currentBaseKey = 'talking';
 
   const packageButtons = document.querySelectorAll('.package-btn');
   packageButtons.forEach(btn => {
@@ -404,10 +410,12 @@
   });
 
   function updateBaseTypePriceTags() {
+    const productPerVideo = BASE_TYPES.product.pricePerVideo[currentPackage];
+    const storyPerVideo = BASE_TYPES.story.pricePerVideo[currentPackage];
     document.getElementById('base-price-product').textContent =
-      '+$' + (15 * packageQty) + ' за пакет';
+      '$' + productPerVideo + ' / відео · +$' + (productPerVideo * packageQty) + ' за пакет';
     document.getElementById('base-price-story').textContent =
-      '+$' + (30 * packageQty) + ' за пакет';
+      '$' + storyPerVideo + ' / відео · +$' + (storyPerVideo * packageQty) + ' за пакет';
   }
 
   const baseButtons = document.querySelectorAll('.base-btn');
@@ -415,8 +423,7 @@
     btn.addEventListener('click', () => {
       baseButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      basePrice = parseFloat(btn.dataset.price);
-      baseLabel = btn.dataset.label;
+      currentBaseKey = btn.dataset.key;
       recalc();
     });
   });
@@ -451,7 +458,11 @@
   }
 
   function recalc() {
-    const baseTotal = basePrice * packageQty;
+    const baseType = BASE_TYPES[currentBaseKey];
+    const baseLabel = baseType.label;
+    const basePerVideo = baseType.pricePerVideo[currentPackage];
+    const baseTotal = basePerVideo * packageQty;
+
     let total = packageBasePrice + baseTotal;
     let extras = [];
 
@@ -465,7 +476,7 @@
     document.getElementById('total').textContent = '$' + Math.round(total);
 
     let breakdownParts = [packageLabel];
-    if (basePrice > 0) breakdownParts.push(baseLabel);
+    if (basePerVideo > 0) breakdownParts.push(baseLabel);
     if (extras.length > 0) breakdownParts.push('+' + extras.length + ' ' + (extras.length === 1 ? 'фактор' : 'фактори'));
     document.getElementById('breakdown').textContent = breakdownParts.join(' · ');
 
