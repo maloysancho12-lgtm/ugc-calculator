@@ -424,7 +424,6 @@
           <span class="package-name">START</span>
         </div>
         <span class="package-qty">10 відео</span>
-        <span class="badge-discount">−20%</span>
       </div>
       <div class="package-right">
         <div class="package-price">$299</div>
@@ -437,7 +436,6 @@
           <span class="badge-popular">Популярний</span>
         </div>
         <span class="package-qty">20 відео</span>
-        <span class="badge-discount">−40%</span>
       </div>
       <div class="package-right">
         <div class="package-price">від $499</div>
@@ -449,7 +447,6 @@
           <span class="package-name">PRO</span>
         </div>
         <span class="package-qty">30 відео</span>
-        <span class="badge-discount">−50%</span>
       </div>
       <div class="package-right">
         <div class="package-price">від $799</div>
@@ -590,16 +587,26 @@
     FACTORS.forEach(factor => {
       const perVideo = factor.pricePerVideo[currentPackage];
       const totalForPackage = perVideo * packageQty;
+      const testPrice = factor.pricePerVideo['test'];
+      const discountPct = (currentPackage !== 'test' && testPrice > 0)
+        ? Math.round((testPrice - perVideo) / testPrice * 100)
+        : 0;
 
       const row = document.createElement('label');
       row.className = 'opt-card';
 
       const priceHint = '$' + perVideo + ' / відео · +$' + totalForPackage + ' за пакет';
+      const discountBadge = discountPct > 0
+        ? '<span class="badge-discount" style="font-size:11px;padding:1px 6px;">−' + discountPct + '%</span>'
+        : '';
 
       row.innerHTML =
         '<input type="checkbox" class="opt-checkbox" data-per-video="' + perVideo + '" data-name="' + factor.name + '">' +
         '<span class="opt-text">' +
-          '<span class="opt-title">' + factor.name + '</span>' +
+          '<span style="display:flex;align-items:center;gap:6px;">' +
+            '<span class="opt-title">' + factor.name + '</span>' +
+            discountBadge +
+          '</span>' +
           '<span class="opt-sub">' + priceHint + '</span>' +
         '</span>';
 
