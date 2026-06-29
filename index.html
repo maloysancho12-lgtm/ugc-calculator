@@ -251,6 +251,14 @@
 
   .package-card.active .package-price { color: var(--accent-text); }
 
+  .package-per-video {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+  }
+
+  .package-card.active .package-per-video { color: rgba(110, 231, 183, 0.5); }
+
   /* ---- Video type cards ---- */
   .base-group {
     display: flex;
@@ -299,12 +307,10 @@
 
   .opt-card {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
     padding: 13px 16px;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    cursor: pointer;
     background: var(--bg-raised);
     transition: border-color 0.2s ease, background 0.2s ease;
   }
@@ -317,12 +323,20 @@
     box-shadow: 0 0 12px rgba(16, 185, 129, 0.04);
   }
 
+  .opt-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+
   .opt-checkbox {
     width: 18px;
     height: 18px;
     flex-shrink: 0;
     accent-color: var(--accent);
     margin: 0;
+    cursor: pointer;
   }
 
   .opt-text {
@@ -346,6 +360,60 @@
   }
 
   .opt-card.checked .opt-sub { color: rgba(110, 231, 183, 0.55); }
+
+  /* ---- Factor slider ---- */
+  .factor-slider-wrap {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 12px;
+  }
+
+  .factor-slider-wrap.visible { display: flex; }
+
+  .factor-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    background: rgba(16, 185, 129, 0.18);
+  }
+
+  .factor-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+    transition: box-shadow 0.15s ease;
+  }
+
+  .factor-slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.65);
+  }
+
+  .factor-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+  }
+
+  .factor-slider-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-text);
+    letter-spacing: -0.01em;
+  }
 
   /* ---- Contact field ---- */
   .contact-block { margin-top: 24px; }
@@ -488,18 +556,19 @@
     <span class="section-label">Пакет</span>
   </div>
   <div class="package-group" id="package-group">
-    <div class="package-card active" data-key="test" data-price="49" data-qty="3" data-label="TEST">
+    <div class="package-card active" data-key="test" data-price="99" data-qty="3" data-label="TEST">
       <div class="package-left">
         <div class="package-name-row">
           <span class="package-name">TEST</span>
         </div>
-        <span class="package-qty">2–3 відео</span>
+        <span class="package-qty">3 відео</span>
       </div>
       <div class="package-right">
-        <div class="package-price">від $49</div>
+        <div class="package-price">$99</div>
+        <div class="package-per-video">$33.00 / відео</div>
       </div>
     </div>
-    <div class="package-card" data-key="start" data-price="299" data-qty="10" data-label="START">
+    <div class="package-card" data-key="start" data-price="279" data-qty="10" data-label="START">
       <div class="package-left">
         <div class="package-name-row">
           <span class="package-name">START</span>
@@ -507,10 +576,11 @@
         <span class="package-qty">10 відео</span>
       </div>
       <div class="package-right">
-        <div class="package-price">$299</div>
+        <div class="package-price">$279</div>
+        <div class="package-per-video">$27.90 / відео</div>
       </div>
     </div>
-    <div class="package-card" data-key="growth" data-price="499" data-qty="20" data-label="GROWTH">
+    <div class="package-card" data-key="growth" data-price="479" data-qty="20" data-label="GROWTH">
       <div class="package-left">
         <div class="package-name-row">
           <span class="package-name">GROWTH</span>
@@ -519,10 +589,11 @@
         <span class="package-qty">20 відео</span>
       </div>
       <div class="package-right">
-        <div class="package-price">від $499</div>
+        <div class="package-price">$479</div>
+        <div class="package-per-video">$23.95 / відео</div>
       </div>
     </div>
-    <div class="package-card" data-key="pro" data-price="799" data-qty="30" data-label="PRO">
+    <div class="package-card" data-key="pro" data-price="649" data-qty="30" data-label="PRO">
       <div class="package-left">
         <div class="package-name-row">
           <span class="package-name">PRO</span>
@@ -530,7 +601,8 @@
         <span class="package-qty">30 відео</span>
       </div>
       <div class="package-right">
-        <div class="package-price">від $799</div>
+        <div class="package-price">$649</div>
+        <div class="package-per-video">$21.63 / відео</div>
       </div>
     </div>
   </div>
@@ -579,7 +651,7 @@
     <div class="result-row">
       <span class="result-label" id="breakdown">TEST</span>
       <span>
-        <span class="result-price" id="total">$49</span>
+        <span class="result-price" id="total">$99</span>
         <span class="result-unit">/ пакет</span>
       </span>
     </div>
@@ -594,7 +666,6 @@
     tg.ready();
     tg.expand();
 
-    // Only apply Telegram theme overrides when in dark mode to preserve our design intent
     const root = document.documentElement;
     if (tg.themeParams && tg.colorScheme === 'light') {
       const tp = tg.themeParams;
@@ -605,10 +676,6 @@
     }
   }
 
-  // Ordered cheapest → most expensive.
-  // pricePerVideo: cost per video for each package — moderate volume discount,
-  // no factor ever reaches $0 (your real AI cost per video scales with complexity
-  // regardless of package size).
   const FACTORS = [
     { id: 'camera',  name: 'Рух камери (не статика)',   pricePerVideo: { test: 10, start: 8,  growth: 6,  pro: 5  } },
     { id: 'dub',     name: 'Дубляж на 1 мову',           pricePerVideo: { test: 10, start: 8,  growth: 6,  pro: 5  } },
@@ -617,19 +684,32 @@
     { id: 'product', name: 'Взаємодія з продуктом',      pricePerVideo: { test: 20, start: 16, growth: 13, pro: 10 } },
   ];
 
-  // Video type surcharges also get the volume discount on bigger packages.
   const BASE_TYPES = {
     talking: { label: 'Talking head',                pricePerVideo: { test: 0,  start: 0,  growth: 0,  pro: 0  } },
     product: { label: 'Демонстрація продукту',        pricePerVideo: { test: 15, start: 12, growth: 9,  pro: 8  } },
     story:   { label: 'Сторітелінг / кілька сцен',    pricePerVideo: { test: 30, start: 24, growth: 18, pro: 15 } },
   };
 
+  // Per-factor state: checked + how many videos the slider is set to (null = not yet set)
+  const factorState = {};
+  FACTORS.forEach(f => { factorState[f.id] = { checked: false, sliderVal: null }; });
+
   let currentPackage = 'test';
-  let packageBasePrice = 49;
+  let packageBasePrice = 99;
   let packageQty = 3;
   let packageLabel = 'TEST';
 
   let currentBaseKey = 'talking';
+
+  // Update the CSS gradient fill on a range slider to reflect its current value
+  function updateSliderFill(slider) {
+    const min = parseInt(slider.min);
+    const max = parseInt(slider.max);
+    const val = parseInt(slider.value);
+    const pct = max > min ? ((val - min) / (max - min)) * 100 : 100;
+    slider.style.background =
+      `linear-gradient(to right, var(--accent) ${pct}%, rgba(16,185,129,0.18) ${pct}%)`;
+  }
 
   const packageCards = document.querySelectorAll('.package-card');
   packageCards.forEach(card => {
@@ -683,37 +763,69 @@
 
     FACTORS.forEach(factor => {
       const perVideo = factor.pricePerVideo[currentPackage];
-      const totalForPackage = perVideo * packageQty;
       const testPrice = factor.pricePerVideo['test'];
       const discountPct = (currentPackage !== 'test' && testPrice > 0)
         ? Math.round((testPrice - perVideo) / testPrice * 100)
         : 0;
 
-      const row = document.createElement('label');
-      row.className = 'opt-card';
+      const state = factorState[factor.id];
+      // Clamp slider value to new package qty; default to full qty on first check
+      const sliderVal = (state.sliderVal === null || state.sliderVal > packageQty)
+        ? packageQty
+        : Math.max(1, state.sliderVal);
+      state.sliderVal = sliderVal;
 
-      const priceHint = '$' + perVideo + ' / відео · +$' + totalForPackage + ' за пакет';
       const discountBadge = discountPct > 0
         ? '<span class="badge-discount" style="font-size:11px;padding:1px 6px;">−' + discountPct + '%</span>'
         : '';
 
-      row.innerHTML =
-        '<input type="checkbox" class="opt-checkbox" data-per-video="' + perVideo + '" data-name="' + factor.name + '">' +
-        '<span class="opt-text">' +
-          '<span style="display:flex;align-items:center;gap:6px;">' +
-            '<span class="opt-title">' + factor.name + '</span>' +
-            discountBadge +
-          '</span>' +
-          '<span class="opt-sub">' + priceHint + '</span>' +
-        '</span>';
+      const card = document.createElement('div');
+      card.className = 'opt-card' + (state.checked ? ' checked' : '');
 
-      const cb = row.querySelector('input[type="checkbox"]');
+      card.innerHTML =
+        '<label class="opt-row">' +
+          '<input type="checkbox" class="opt-checkbox" data-id="' + factor.id + '"' + (state.checked ? ' checked' : '') + '>' +
+          '<span class="opt-text">' +
+            '<span style="display:flex;align-items:center;gap:6px;">' +
+              '<span class="opt-title">' + factor.name + '</span>' +
+              discountBadge +
+            '</span>' +
+            '<span class="opt-sub">$' + perVideo + ' / відео</span>' +
+          '</span>' +
+        '</label>' +
+        '<div class="factor-slider-wrap' + (state.checked ? ' visible' : '') + '">' +
+          '<input type="range" class="factor-slider" min="1" max="' + packageQty + '" value="' + sliderVal + '" step="1">' +
+          '<span class="factor-slider-label">' +
+            sliderVal + ' з ' + packageQty + ' відео · +$' + (perVideo * sliderVal) +
+          '</span>' +
+        '</div>';
+
+      const cb = card.querySelector('input[type="checkbox"]');
+      const sliderWrap = card.querySelector('.factor-slider-wrap');
+      const slider = card.querySelector('.factor-slider');
+      const sliderLabel = card.querySelector('.factor-slider-label');
+
+      updateSliderFill(slider);
+
       cb.addEventListener('change', () => {
-        row.classList.toggle('checked', cb.checked);
+        state.checked = cb.checked;
+        card.classList.toggle('checked', cb.checked);
+        sliderWrap.classList.toggle('visible', cb.checked);
         recalc();
       });
 
-      grid.appendChild(row);
+      slider.addEventListener('input', () => {
+        const val = parseInt(slider.value);
+        state.sliderVal = val;
+        sliderLabel.textContent = val + ' з ' + packageQty + ' відео · +$' + (perVideo * val);
+        updateSliderFill(slider);
+        recalc();
+      });
+
+      // Prevent slider clicks from toggling the checkbox via label propagation
+      slider.addEventListener('click', e => e.stopPropagation());
+
+      grid.appendChild(card);
     });
   }
 
@@ -721,16 +833,20 @@
     const baseType = BASE_TYPES[currentBaseKey];
     const baseLabel = baseType.label;
     const basePerVideo = baseType.pricePerVideo[currentPackage];
+    // Video type applies to the full package quantity
     const baseTotal = basePerVideo * packageQty;
 
     let total = packageBasePrice + baseTotal;
     let extras = [];
 
-    document.querySelectorAll('#opt-grid input[type="checkbox"]:checked').forEach(cb => {
-      const perVideo = parseFloat(cb.dataset.perVideo);
-      const lineTotal = perVideo * packageQty;
+    FACTORS.forEach(factor => {
+      const state = factorState[factor.id];
+      if (!state.checked) return;
+      const perVideo = factor.pricePerVideo[currentPackage];
+      const count = state.sliderVal !== null ? state.sliderVal : packageQty;
+      const lineTotal = perVideo * count;
       total += lineTotal;
-      extras.push(cb.dataset.name + ' (+$' + lineTotal + ')');
+      extras.push(factor.name + ' ×' + count + ' (+$' + lineTotal + ')');
     });
 
     document.getElementById('total').textContent = '$' + Math.round(total);
@@ -740,12 +856,7 @@
     if (extras.length > 0) breakdownParts.push('+' + extras.length + ' ' + (extras.length === 1 ? 'фактор' : 'фактори'));
     document.getElementById('breakdown').textContent = breakdownParts.join(' · ');
 
-    return {
-      total: Math.round(total),
-      packageLabel,
-      baseLabel,
-      extras,
-    };
+    return { total: Math.round(total), packageLabel, baseLabel, extras };
   }
 
   const BACKEND_URL = 'https://ugc-calculator-backend.vercel.app/api/calculate';
